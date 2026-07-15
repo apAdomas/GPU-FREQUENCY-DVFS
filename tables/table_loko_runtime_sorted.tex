@@ -1,0 +1,35 @@
+% Auto-generated from normalized_loko_metrics.csv
+\begin{table*}[t]
+\centering
+\caption{LOKO prediction accuracy for runtime-ratio prediction. Rows are ordered by MAPE, lower is better.}
+\label{tab:loko-runtime-accuracy}
+\scriptsize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{llrrrrr}
+\toprule
+Features & Model & $n_f$ & MAE & MAPE (\%) & Med. APE (\%) & P90 APE (\%) \\
+\midrule
+PTX+launch+runtime & ExtraTrees & 226 & 0.327 & 8.28 & 2.88 & 22.37 \\
+PTX+runtime & ExtraTrees & 214 & 0.318 & 8.31 & 2.97 & 23.66 \\
+Launch+runtime & ExtraTrees & 174 & 0.320 & 8.36 & 2.68 & 22.39 \\
+Runtime & XGBoost & 162 & 0.322 & 8.71 & 3.03 & 22.36 \\
+Runtime & ExtraTrees & 162 & 0.325 & 8.97 & 2.76 & 25.30 \\
+PTX+launch+runtime & XGBoost & 226 & 0.360 & 9.04 & 3.45 & 23.27 \\
+PTX+runtime & XGBoost & 214 & 0.356 & 9.05 & 3.43 & 23.87 \\
+Launch+runtime & XGBoost & 174 & 0.340 & 9.19 & 3.05 & 25.40 \\
+Runtime & RF & 162 & 0.359 & 9.36 & 3.87 & 24.63 \\
+Launch+runtime & RF & 174 & 0.364 & 9.42 & 3.88 & 24.35 \\
+PTX+runtime & RF & 214 & 0.384 & 9.72 & 4.34 & 23.43 \\
+PTX+launch+runtime & RF & 226 & 0.389 & 9.85 & 4.44 & 24.23 \\
+PTX+launch & XGBoost & 71 & 0.703 & 17.19 & 6.60 & 45.84 \\
+Launch & RF & 19 & 0.650 & 18.19 & 6.54 & 43.49 \\
+Launch & ExtraTrees & 19 & 0.682 & 18.40 & 6.86 & 45.82 \\
+PTX+launch & ExtraTrees & 71 & 0.726 & 18.50 & 7.26 & 50.56 \\
+Launch & XGBoost & 19 & 0.621 & 18.84 & 6.71 & 44.89 \\
+PTX+launch & RF & 71 & 0.773 & 18.95 & 7.48 & 51.68 \\
+PTX & ExtraTrees & 59 & 1.081 & 27.78 & 7.07 & 62.63 \\
+PTX & RF & 59 & 1.048 & 27.88 & 7.79 & 62.47 \\
+PTX & XGBoost & 59 & 1.014 & 29.33 & 6.70 & 57.87 \\
+\bottomrule
+\end{tabular}
+\end{table*}
