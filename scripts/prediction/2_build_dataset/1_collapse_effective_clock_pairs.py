@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""Collapse requested clock pairs that applied to the same (core, mem).
+
+Downstream treats requested != auto as a fixed row, so requested clocks
+are rewritten to the applied/effective pair after the merge.
+"""
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -37,14 +42,12 @@ STD_COLS = [
 def main():
     df = pd.read_csv(IN_CSV)
 
-    # Normalize auto/fixed masks.
     core_s = df["requested_core_clock"].astype(str).str.lower()
     mem_s = df["requested_mem_clock"].astype(str).str.lower()
 
     auto = df[(core_s == "auto") & (mem_s == "auto")].copy()
     fixed = df[(core_s != "auto") & (mem_s != "auto")].copy()
 
-    # Numeric applied clocks for fixed rows.
     fixed["applied_core_clock"] = pd.to_numeric(fixed["applied_core_clock"], errors="coerce")
     fixed["applied_mem_clock"] = pd.to_numeric(fixed["applied_mem_clock"], errors="coerce")
 
@@ -54,7 +57,6 @@ def main():
         + fixed["requested_mem_clock"].astype(str)
     )
 
-    # Aggregate fixed rows by effective/applied clock pair.
     agg_spec = {}
 
     for c in fixed.columns:
@@ -64,7 +66,6 @@ def main():
         if c in MEAN_COLS:
             agg_spec[c] = "mean"
         elif c in STD_COLS:
-            # Existing std columns are not meaningful with n=1, recompute later.
             agg_spec[c] = "mean"
         elif c == "n":
             agg_spec[c] = "sum"
@@ -81,7 +82,6 @@ def main():
 
     collapsed = fixed.groupby(GROUP_FIXED, as_index=False).agg(agg_spec)
 
-    # Count how many requested grid points mapped to each effective pair.
     counts = (
         fixed.groupby(GROUP_FIXED, as_index=False)
         .agg(
@@ -92,19 +92,14 @@ def main():
 
     collapsed = collapsed.merge(counts, on=GROUP_FIXED, how="left")
 
-    # Use effective clocks as requested clocks for downstream scripts if needed.
-    # Keep original merged requested info separately.
     collapsed["effective_core_clock"] = collapsed["applied_core_clock"]
     collapsed["effective_mem_clock"] = collapsed["applied_mem_clock"]
 
-    # Important: downstream scripts identify fixed rows by requested != auto.
-    # Set requested to effective numeric clock for the cleaned dataset.
     collapsed["requested_core_clock_original"] = collapsed["requested_core_clock"]
     collapsed["requested_mem_clock_original"] = collapsed["requested_mem_clock"]
     collapsed["requested_core_clock"] = collapsed["effective_core_clock"]
     collapsed["requested_mem_clock"] = collapsed["effective_mem_clock"]
 
-    # Auto rows: keep as is; but add effective columns.
     auto = auto.copy()
     auto["effective_core_clock"] = np.nan
     auto["effective_mem_clock"] = np.nan
@@ -113,7 +108,6 @@ def main():
     auto["requested_core_clock_original"] = auto["requested_core_clock"]
     auto["requested_mem_clock_original"] = auto["requested_mem_clock"]
 
-    # Align columns.
     all_cols = []
     for d in [auto, collapsed]:
         for c in d.columns:

@@ -274,7 +274,7 @@ def get_exe_args(source_folder: str, kernel: str, exe: Path) -> list[str]:
     if "polybenchGpu" in str(exe):
         return []
 
-    # Parboil: mirror the per-workload run_*_kernel_energy.sh launch arguments.
+    # Parboil: same CLI args as run_*_kernel_energy.sh.
     if "parboil_2.5" in str(exe):
         if sf == "histo":
             return [str(PARBOIL_DATA / "histo" / "default" / "input" / "img.bin")]
@@ -304,7 +304,7 @@ def get_exe_args(source_folder: str, kernel: str, exe: Path) -> list[str]:
             ]
         return []
 
-    # Rodinia: mirror the per-workload run_*_kernel_energy.sh launch arguments.
+    # Rodinia: same CLI args as run_*_kernel_energy.sh.
     if sf == "kmeans":
         return ["1000000", "34", "32"]
 

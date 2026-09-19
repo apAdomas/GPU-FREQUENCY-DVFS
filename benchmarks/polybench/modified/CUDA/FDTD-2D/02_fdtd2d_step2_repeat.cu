@@ -14,10 +14,7 @@
  * 6) copy back once
  * 7) exit
  *
- * Important:
- * - Global GPU warmup at max clocks (e.g. 100 s) should be done outside this
- *   executable in the launcher script, before testing clock pairs.
- * - Clocks should also be locked outside this executable.
+ * Thermal warmup and clock lock are done by the launcher, not this exe.
  */
 
 #include <stdio.h>

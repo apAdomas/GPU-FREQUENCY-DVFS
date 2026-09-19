@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-"""
-Summarize recorded pipeline timings for thesis reporting.
+"""Pipeline timing stats from NCU CSVs and oracle summary.log files.
 
 Sources:
-  - NCU profiling wall time: results/ncu_features_all.csv  (column ncu_wall_s)
-  - Oracle energy measurements: */summary.log under results/*_kernel_energy/
-    (configured warmup/measure windows; wall clock NOT logged for main pipeline)
-  - Model training: NOT recorded by default (see note in output)
+  ncu_features_all.csv          column ncu_wall_s
+  results/*_kernel_energy/**/summary.log   warmup_seconds + measure_seconds
+  train_*.log                   mtime only; train wall time is not logged
 
-For skewed per-run durations, report the median as the typical cost and the mean
-for total-budget estimates. Both are printed; a LaTeX-ready line uses median.
+Writes ~/thesis/results/master/pipeline_timing_summary.csv
 """
 from __future__ import annotations
 
@@ -135,9 +132,7 @@ def main():
 
         med = summary_rows[-1]["median_s"]
         print()
-        print("   Thesis line (typical NCU profile, use median):")
-        print(f"   \"Each NCU kernel profile took a median of {med:.1f}\\,s wall-clock time "
-              f"({len(ok)} kernels).\"")
+        print(f"   median NCU wall time: {med:.1f}s  (n={len(ok)} successful kernels)")
     else:
         print("   No NCU timing data found.")
 
@@ -177,12 +172,6 @@ def main():
     if train_logs:
         latest = train_logs[-1]
         print(f"   Latest train log: {latest.name}  (mtime only, not duration)")
-
-    print("\nMean vs median (for your write-up)")
-    print("-" * 60)
-    print("  Use MEDIAN for \"typical per-run profiling cost\" (robust to slow outliers).")
-    print("  Use MEAN (or total sum) for \"expected total pipeline overhead / budget\".")
-    print("  Reporting both + n is standard in systems papers.")
 
     if summary_rows:
         args.out.parent.mkdir(parents=True, exist_ok=True)

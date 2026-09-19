@@ -1,29 +1,17 @@
 #!/usr/bin/env bash
 #
-# Shared driver for the Parboil per-kernel energy oracles.
+# Shared Parboil energy-oracle driver. Caller sources measurement_common.sh
+# and this file, sets the variables below, then: oracle_init; oracle_run_all
 #
-# A per-benchmark script sources measurement_common.sh and this file, then sets:
-#   OUTDIR                 - results directory (created by caller)
-#   WORKLOAD_PREFIX        - e.g. "histo"
-#   SLEEP_AFTER_CLOCK_LOCK - seconds to settle after locking clocks (e.g. 1)
-#   CORE_CLOCKS=(...)      - graphics clocks to sweep
-#   MEM_CLOCKS=(...)       - memory clocks to sweep
-#   REPEATS                - repeats per (kernel, clock) case (1)
+#   OUTDIR, WORKLOAD_PREFIX, SLEEP_AFTER_CLOCK_LOCK
+#   CORE_CLOCKS, MEM_CLOCKS, REPEATS
 #   GLOBAL_WARMUP_CORE / GLOBAL_WARMUP_MEM / GLOBAL_WARMUP_EXE
-#   KERNEL_NAMES=(...)     - short kernel names
-#   KERNEL_EXES=(...)      - matching executables (energy build, *_repeat.exe)
-#   KERNEL_ARGS=(...)      - matching full argument strings (may be empty)
-# and finally calls:  oracle_init  then  oracle_run_all
+#   KERNEL_NAMES, KERNEL_EXES, KERNEL_ARGS
 #
-# The sweep per kernel is (matches GEMVER / Rodinia srad):
-#   1) full CORE x MEM fixed/fixed grid
-#   2) auto/auto
-#   3) each CORE with mem auto
-#   4) each MEM with core auto
-# => 6*5 + 1 + 6 + 5 = 42 cases per kernel per repeat
+# Sweep per kernel (same as GEMVER / Rodinia):
+#   CORE×MEM grid, then auto/auto, core-only, mem-only
+#   (6*5 + 1 + 6 + 5 = 42 cases / kernel / repeat)
 #
-# Requires (from measurement_common.sh): lock_clocks, lock_core_clock,
-# lock_mem_clock, reset_clocks, log_gpu_state, run_global_warmup.
 
 GPU_NAME=""
 DRIVER_VERSION=""

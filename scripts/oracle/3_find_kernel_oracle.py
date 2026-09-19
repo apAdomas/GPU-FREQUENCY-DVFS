@@ -4,7 +4,7 @@ import csv, sys
 from collections import defaultdict
 
 if len(sys.argv) != 2:
-    raise SystemExit("Usage: python3 3_find_kernel_oracle_auto.py <results_dir>")
+    raise SystemExit("Usage: python3 3_find_kernel_oracle.py <results_dir>")
 
 base = Path(sys.argv[1]).expanduser()
 runs = sorted([p for p in base.iterdir() if p.is_dir()])

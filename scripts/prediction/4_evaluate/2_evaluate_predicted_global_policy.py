@@ -127,16 +127,9 @@ def add_virtual_auto_rows(candidates: pd.DataFrame) -> pd.DataFrame:
 
 
 def solve_predicted_global_policy(candidates: pd.DataFrame, limit: float) -> pd.DataFrame:
-    """
-    Solve global compute-waste selection using predicted time and energy.
+    """One predicted clock pair per kernel; min pred energy s.t. pred time <= auto_total * limit.
 
-    Objective:
-        minimize predicted total energy
-
-    Constraint:
-        predicted total time <= auto_total_time * limit
-
-    Then the selected policy is later evaluated using actual measured time/energy.
+    Selected pairs are scored later on measured time/energy.
     """
     c = candidates.copy().reset_index(drop=True)
 

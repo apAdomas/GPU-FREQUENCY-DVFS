@@ -1,16 +1,10 @@
 #!/usr/bin/env python3
-"""
-Estimate single-kernel execution time from oracle measurements.
-
-Each kernel is launched repeatedly for ~5 seconds (MEASURE_SECONDS).
-We divide total measured CUDA time by launch count to get duration per launch:
+"""Per-launch duration from the 5s oracle measure window.
 
     duration_per_launch_ms = total_time_mean_ms / measured_launches_mean
 
-Example: 13,000 launches in 5000 ms → ~0.38 ms per launch.
-
-Input:  ~/thesis/results/master/aggregated_all_kernels_effective.csv
-Output: printed table + optional CSV (default writes to results/master/)
+In:  ~/thesis/results/master/aggregated_all_kernels_effective.csv
+Out: printed table + ~/thesis/results/master/kernel_duration_auto.csv
 """
 from __future__ import annotations
 
@@ -24,7 +18,6 @@ OUT_CSV = Path.home() / "thesis/results/master/kernel_duration_auto.csv"
 
 
 def kernel_durations(df: pd.DataFrame, clock: str = "auto") -> pd.DataFrame:
-    """One row per kernel at the given clock config (default auto/auto)."""
     core = df["requested_core_clock"].astype(str).str.lower()
     mem = df["requested_mem_clock"].astype(str).str.lower()
 
@@ -39,7 +32,6 @@ def kernel_durations(df: pd.DataFrame, clock: str = "auto") -> pd.DataFrame:
     launches = sub["measured_launches_mean"].astype(float)
     total_ms = sub["total_time_mean_ms"].astype(float)
 
-    # Prefer stored value; recompute if missing.
     if "time_per_launch_mean_ms" in sub.columns:
         dur_ms = sub["time_per_launch_mean_ms"].astype(float)
     else:

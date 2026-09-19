@@ -1,15 +1,6 @@
 /**
- * global_warmup_fdtd_sequence.cu
- *
- * Dedicated global GPU thermal warmup executable.
- *
- * Purpose:
- * - run the full FDTD sequence repeatedly for GLOBAL_WARMUP_SECONDS
- * - no time/energy measurement
- * - used only to bring GPU to a stable hot state before oracle runs
- *
- * Important:
- * - clocks are locked outside this executable by the shell script
+ * Thermal warmup: repeat the FDTD sequence for GLOBAL_WARMUP_SECONDS.
+ * No time/energy logging. Clocks are locked by the launcher script.
  */
 
  #include <stdio.h>

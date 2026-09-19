@@ -1,12 +1,6 @@
 /**
- * fdtd2d_sequence_repeat.cu
- *
- * Purpose:
- * - run the 20-step FDTD kernel sequence repeatedly
- * - reset GPU arrays before each repeat
- * - stop after enough sequence runtime has accumulated
- * - no per-kernel timing instrumentation
- * - intended for energy measurement runs
+ * Full 20-step FDTD sequence, reset arrays each repeat.
+ * Legacy whole-app harness; per-kernel oracles use 01/02/03_*_repeat.cu.
  */
 
 #include <stdio.h>

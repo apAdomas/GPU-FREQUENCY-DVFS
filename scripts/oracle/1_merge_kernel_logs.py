@@ -4,7 +4,7 @@ import re
 import sys
 
 if len(sys.argv) != 2:
-    raise SystemExit("Usage: python3 merge_kernel_logs.py <results_dir>")
+    raise SystemExit("Usage: python3 1_merge_kernel_logs.py <results_dir>")
 
 base = Path(sys.argv[1]).expanduser()
 if not base.exists():

@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
-"""
-Predicted global policy outcomes per allowed slowdown bound.
+"""Global-policy scatter per slowdown bound (0/1/2/5%).
 
-For each bound (0/1/2/5%):
-    - circles  = policies without runtime features
-    - squares  = policies with runtime features
-    - grey     = valid (respects bound), red = bound violation
-    - large green marker = best valid policy at that bound
-Black triangles mark the measured global oracle at each bound.
-
-Outputs to ~/thesis/figures/
+Circle = no runtime features, square = with runtime features.
+Grey = feasible, red = bound violation, large green = best feasible.
+Black triangle = measured global oracle. Writes ~/thesis/figures/.
 """
 from pathlib import Path
 import numpy as np

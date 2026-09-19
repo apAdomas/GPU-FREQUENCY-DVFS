@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-"""
-Oracle vs predicted global policy: clock-pair selection heatmaps.
+"""Heatmaps of (core, mem) assignments: measured oracle vs predicted global policy.
 
-2 rows (Oracle / Predicted) × 2 columns (0% and 5% bounds only).
-Cell color = number of kernels assigned to that (core, mem) pair.
-Zero cells = white; low counts = light green; smooth ramp to dark NVIDIA green.
-
-Outputs to ~/thesis/figures/
+Layout: 2 rows (oracle / predicted) × 2 columns (0% and 5% bounds).
+Cell value = kernel count at that clock pair. Writes ~/thesis/figures/.
 """
 from pathlib import Path
 import numpy as np
@@ -16,8 +12,6 @@ from matplotlib.colors import LinearSegmentedColormap, PowerNorm
 from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import MaxNLocator
 
-# Smooth NVIDIA green ramp: light for low counts, gradual transition to dark.
-# (White is only for empty/masked cells, not mapped data values.)
 NVIDIA_CMAP = LinearSegmentedColormap.from_list(
     "nvidia_green",
     ["#EEF7EA", "#DCEFD4", "#C5E1A5", "#9CCC65", "#76B900", "#558B2F", "#33691E"],

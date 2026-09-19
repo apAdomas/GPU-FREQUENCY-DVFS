@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""Leave-one-kernel-out regression of time/energy ratios vs auto.
+
+Reads ml_dataset_ptx_launch_runtime_normalized.csv.
+Writes LOKO metrics, per-row predictions, and fold timings under
+ptx_launch_runtime_normalized_models/.
+"""
 from pathlib import Path
 import math
 import time
@@ -273,7 +279,6 @@ DROP_ALWAYS = {
 }
 
 
-# remove dupelicate colums
 def unique_keep_order(cols):
     seen = set()
     out = []
@@ -284,7 +289,6 @@ def unique_keep_order(cols):
     return out
 
 
-# create table for skloearn
 def clean_numeric_features(df, cols, drop_constant=False):
     cols = unique_keep_order([c for c in cols if c in df.columns])
     out = pd.DataFrame(index=df.index)
@@ -309,7 +313,6 @@ def clean_numeric_features(df, cols, drop_constant=False):
     return out, kept
 
 
-# define which feature combination to test
 def feature_sets(df):
     ptx_cols = unique_keep_order(GROUPED_PTX_COLS)
     launch_cols = unique_keep_order(LAUNCH_COLS)
@@ -335,7 +338,6 @@ def feature_sets(df):
     }
 
 
-# define models to test
 def models():
     return {
         "random_forest": RandomForestRegressor(
@@ -369,7 +371,6 @@ def models():
 
 def timing_stats(train_times_s: list[float], predict_times_s: list[float],
                  test_rows: list[int]) -> dict:
-    """Summarize LOKO fold timings; per-row predict cost is the runtime-relevant metric."""
     train = np.asarray(train_times_s, dtype=float)
     pred = np.asarray(predict_times_s, dtype=float)
     rows = np.asarray(test_rows, dtype=int)
@@ -401,22 +402,20 @@ def metrics(y_true, y_pred):
 
     return {
         "n": int(len(y_true)),
-        "mae": float(mean_absolute_error(y_true, y_pred)), # mean absolute error
-        "rmse": float(math.sqrt(mean_squared_error(y_true, y_pred))), # root mean squared error
-        "mape_pct": float(np.mean(ape)), # mean absolute percentage error
-        "median_ape_pct": float(np.median(ape)), # median absolute percentage error
-        "p90_ape_pct": float(np.percentile(ape, 90)), # 90th percentile of absolute percentage error
-        "max_ape_pct": float(np.max(ape)), # maximum absolute percentage error
-        "mean_true": float(np.mean(y_true)), # mean of true values
-        "mean_pred": float(np.mean(y_pred)), # mean of predicted values
+        "mae": float(mean_absolute_error(y_true, y_pred)),
+        "rmse": float(math.sqrt(mean_squared_error(y_true, y_pred))),
+        "mape_pct": float(np.mean(ape)),
+        "median_ape_pct": float(np.median(ape)),
+        "p90_ape_pct": float(np.percentile(ape, 90)),
+        "max_ape_pct": float(np.max(ape)),
+        "mean_true": float(np.mean(y_true)),
+        "mean_pred": float(np.mean(y_pred)),
     }
 
 
-# main function
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # load data
     df = pd.read_csv(IN_CSV)
     df["kernel_id"] = df["join_workload"].astype(str) + "::" + df["join_kernel"].astype(str)
 
@@ -431,10 +430,8 @@ def main():
     all_pred_rows = []
     all_fold_timing_rows = []
 
-    # Get all kernels for LOKO
     kernels = sorted(df["kernel_id"].unique())
 
-    # iterate over targets and feature sets
     for target_name, target_col in TARGETS.items():
         print()
         print(f"TARGET: {target_name} ({target_col})")
@@ -450,19 +447,15 @@ def main():
                 fold_predict_s = []
                 fold_test_rows = []
 
-                # LOKO loop: leave kernel out, train on remaining, predict left out kernel
                 for kid in kernels:
                     train_idx = df["kernel_id"] != kid
                     test_idx = df["kernel_id"] == kid
 
-                    # split train and test
                     train = df.loc[train_idx].copy()
                     test = df.loc[test_idx].copy()
 
                     X_train, kept_cols = clean_numeric_features(train, cols, drop_constant=True)
                     X_test, _ = clean_numeric_features(test, kept_cols, drop_constant=False)
-
-                    # Align columns exactly.
                     X_test = X_test.reindex(columns=X_train.columns, fill_value=0.0)
 
                     y_train_raw = pd.to_numeric(train[target_col], errors="coerce").to_numpy(dtype=float)
@@ -472,16 +465,14 @@ def main():
                     y_train_raw = np.clip(y_train_raw, eps, None)
                     y_test_raw = np.clip(y_test_raw, eps, None)
 
-                    # Train on log ratios instead of raw ratios.
+                    # Fit log(ratio); invert with exp after predict.
                     y_train_log = np.log(y_train_raw)
 
-                    # fit model
                     fold_model = clone(model)
                     t0 = time.perf_counter()
                     fold_model.fit(X_train, y_train_log)
                     train_s = time.perf_counter() - t0
 
-                    # predict held-out kernel
                     t0 = time.perf_counter()
                     y_pred_log = fold_model.predict(X_test)
                     predict_s = time.perf_counter() - t0
@@ -504,7 +495,6 @@ def main():
                         "n_features": len(kept_cols),
                     })
 
-                    # store true/pred values
                     y_true_all.extend(y_test_raw.tolist())
                     y_pred_all.extend(y_pred_raw.tolist())
 
@@ -537,9 +527,7 @@ def main():
 
                     pred_parts.append(part)
 
-                # calculate metrics
                 m = metrics(y_true_all, y_pred_all)
-                # update metrics with added labesl
                 m.update({
                     "target_name": target_name,
                     "target_col": target_col,
@@ -580,7 +568,7 @@ def main():
     print(f"Wrote {timings_path}")
 
     print()
-    print("Timing summary (median predict cost per row = runtime-relevant overhead):")
+    print("Timing summary (median predict ms/row):")
     timing_cols = [
         "target_name", "feature_set", "model",
         "train_total_s", "train_median_fold_s",
@@ -609,7 +597,6 @@ def main():
         "median_ape_pct",
         "p90_ape_pct",
         "mae",
-        
         "rmse",
     ]].to_string(index=False))
 

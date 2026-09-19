@@ -1,17 +1,8 @@
 #!/usr/bin/env bash
 #
-# build_profile_exes.sh
-#
-# Compiles NCU profiling executables (<name>_profile.exe) for every
-# isolated *_repeat.cu kernel under polybenchGpu/CUDA (files starting
-# with a numeric prefix, e.g. 01_gemm_kernel_repeat.cu).
-#
-# Profiling build:
-#   -DNCU_PROFILE      activates cudaProfilerStart()/cudaProfilerStop() markers
-#   -DWARMUP_SECONDS=1 short warmup (NCU only needs one captured launch)
-#   -DMEASURE_SECONDS=0.1
-#
-# Pair with: ncu --profile-from-start off --launch-count 1 ...
+# Build <stem>_profile.exe for each NN_*_repeat.cu under $HOME/polybenchGpu/CUDA.
+#   -DNCU_PROFILE -DWARMUP_SECONDS=1 -DMEASURE_SECONDS=0.1
+# Use with: ncu --profile-from-start off --launch-count 1
 #
 set -uo pipefail
 

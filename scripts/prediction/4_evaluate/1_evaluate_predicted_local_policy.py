@@ -66,14 +66,7 @@ def build_candidate_table(preds: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_virtual_auto_rows(candidates: pd.DataFrame) -> pd.DataFrame:
-    """
-    Auto is always a valid fallback:
-      predicted ratio = 1
-      actual ratio = 1
-      energy saving = 0
-
-    The prediction file only has fixed clock candidates, so we add auto manually.
-    """
+    """Insert auto/auto (ratio=1) — LOKO predictions cover fixed clocks only."""
     group_cols = ["workload", "kernel", "kernel_id", "feature_set", "model"]
 
     autos = []
@@ -132,10 +125,7 @@ def select_predicted_policy(g: pd.DataFrame, limit: float):
 
 
 def select_actual_oracle(g: pd.DataFrame, limit: float) -> pd.Series:
-    """
-    True oracle: lowest actual energy among actually-feasible candidates.
-    Auto is included, so this always has at least one feasible candidate.
-    """
+    """Min measured energy among candidates with actual_time_ratio <= limit."""
     feasible = g[g["actual_time_ratio"] <= limit + 1e-9].copy()
 
     if feasible.empty:

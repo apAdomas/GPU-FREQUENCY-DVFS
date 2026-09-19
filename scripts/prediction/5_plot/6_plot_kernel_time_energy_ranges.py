@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
-"""
-Per-kernel time and energy across all measured clock configurations.
+"""Per-kernel auto time/energy (dot) and min–max range over all clock configs (bar).
 
-Dot   = auto configuration.
-Bar   = [min, max] achieved by ANY clock config (auto included so the dot is
-        always inside the bar).
-
-PolyBench and Rodinia only (Parboil is excluded on purpose).
-
-Suite is inferred from the full executable path, which is the only reliable
-signal: workload names are lower-cased (2dconv, jacobi2d, srad_v1) and
-source_folder is a bare folder name (2DCONV, euler3d), so neither matches a
-"polybench"/"rodinia" substring on its own.
+PolyBench + Rodinia only. Suite is taken from the executable path, not the
+workload name (names like 2dconv / srad_v1 do not contain the suite string).
 """
 from pathlib import Path
 import argparse

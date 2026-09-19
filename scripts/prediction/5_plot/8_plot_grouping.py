@@ -1,19 +1,12 @@
 #!/usr/bin/env python3
-"""
-Switch-aware grouping illustration using measured kernels.
+"""Switch-aware kernel grouping illustration from measured clocks.
 
-Inputs:
-  - summary CSV with auto_time_s
-  - selection CSV with selected/effective clock pair per kernel
+In:  auto_time_s summary + selected/effective clock pair per kernel.
+Out: fig_grouping_dependencies.*, fig_grouping_schedule_timeline.*, grouping_schedule.csv
 
-Outputs:
-  - fig_grouping_dependencies.pdf/png
-  - fig_grouping_schedule_timeline.pdf/png
-  - grouping_schedule.csv
-
-The dependency figure uses real benchmark workload groups where possible.
-The schedule is a greedy dependency-preserving grouping illustration.
-Switching is shown as a non-blocking overlay, not as idle time.
+Dependencies follow real benchmark groups when available. The schedule is a
+greedy, dependency-preserving grouping; clock switches are drawn as overlay,
+not idle time.
 """
 
 from pathlib import Path

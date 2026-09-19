@@ -4,7 +4,7 @@ import csv, math, sys
 from collections import defaultdict
 
 if len(sys.argv) != 2:
-    raise SystemExit("Usage: python3 2_aggregate_kernel_logs_clean.py <results_dir>")
+    raise SystemExit("Usage: python3 2_aggregate_kernel_logs.py <results_dir>")
 
 base = Path(sys.argv[1]).expanduser()
 runs = sorted([p for p in base.iterdir() if p.is_dir()])

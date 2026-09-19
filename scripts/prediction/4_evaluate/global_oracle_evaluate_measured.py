@@ -94,15 +94,9 @@ def add_virtual_auto_rows(candidates: pd.DataFrame) -> pd.DataFrame:
 
 
 def solve_global_waste_oracle(candidates: pd.DataFrame, limit: float) -> pd.DataFrame:
-    """
-    Jeffrey/Spaan-style global compute-waste oracle.
+    """One measured clock pair per kernel; min energy s.t. sum(time) <= auto_total * limit.
 
-    Choose exactly one configuration per kernel.
-    Minimize total measured energy.
-    Constraint: total measured runtime <= total auto runtime * limit.
-
-    Individual kernels may exceed the local slowdown bound. That is allowed here
-    if the full sequence remains within the global runtime budget.
+    Local per-kernel slowdown may exceed the bound if the sequence stays feasible.
     """
     c = candidates.copy().reset_index(drop=True)
 
